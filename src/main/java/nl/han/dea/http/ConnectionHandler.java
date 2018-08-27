@@ -12,6 +12,9 @@ public class ConnectionHandler implements Runnable {
 
     private static final String SERVER_NAME = "Simple DEA Webserver";
     private static final String HTTP_STATUS_200 = "200 OK";
+    private static final String HTTP_STATUS_404 = "404 NOT FOUND";
+    private static final String HTTP_STATUS_501 = "501 NOT IMPLEMENTED";
+    private static final String HTTP_STATUS_505 = "505 HTTP VERSION NOT SUPPORTED";
     private static final String INDEX_HTML_PAGE = "pages/index.html";
 
     private final String HEADER_TEMPLATE = "HTTP/1.1 {{HTTP_STATUS}}\n" +
@@ -34,18 +37,47 @@ public class ConnectionHandler implements Runnable {
                     new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
             BufferedWriter outputStreamWriter = new BufferedWriter(
                     new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.US_ASCII));
-            String requestLine;
-            while ((requestLine = inputStreamReader.readLine()) != null) {
-                System.out.println(requestLine);
-                if (lineMarksEndOfRequest(requestLine)) {
-                    writeResponseMessage(outputStreamWriter);
-                    break;
-                }
-            }
+
+            parseHttpRequest(inputStreamReader, outputStreamWriter);
+            writeResponseMessage(outputStreamWriter);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private void parseHttpRequest(BufferedReader inputStreamReader, BufferedWriter outputStreamWriter) throws IOException {
+        boolean startLine = true;
+        String requestLine;
+        while ((requestLine = inputStreamReader.readLine()) != null) {
+            System.out.println(requestLine);
+            if (startLine) {
+                startLine = false;
+                processStartLine(outputStreamWriter, requestLine);
+            } else {
+                if (lineMarksEndOfRequest(requestLine)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private void processStartLine(BufferedWriter outputStreamWriter, String requestLine) throws IOException {
+        String startLineTokens[] = requestLine.split(" ");
+        if (!"GET".equals(startLineTokens[0])) {
+            outputStreamWriter.write(generateHeader(HTTP_STATUS_501, null));
+            outputStreamWriter.newLine();
+            outputStreamWriter.flush();
+        } else if (!"/index.html".equals(startLineTokens[1])) {
+            outputStreamWriter.write(generateHeader(HTTP_STATUS_404, null));
+            outputStreamWriter.newLine();
+            outputStreamWriter.flush();
+        } else if (!"HTTP/1.1".equals(startLineTokens[2])) {
+            outputStreamWriter.write(generateHeader(HTTP_STATUS_505, null));
+            outputStreamWriter.newLine();
+            outputStreamWriter.flush();
+        }
     }
 
     private void writeResponseMessage(BufferedWriter outputStreamWriter) {

@@ -17,11 +17,15 @@ public class HttpServer {
 
     public void startServer() {
         try (
-                ServerSocket serverSocket = new ServerSocket(this.tcpPort);
+                ServerSocket serverSocket = new ServerSocket(this.tcpPort)
         ) {
             System.out.println("Server accepting requests on port " + tcpPort);
             while (true) {
-                new Thread(new ConnectionHandler(serverSocket.accept())).start();
+                try {
+                    new Thread(new ConnectionHandler(serverSocket.accept())).start();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
