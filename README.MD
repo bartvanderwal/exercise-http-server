@@ -1,72 +1,122 @@
-# Introduction
+# Introductie
 
-This exercise is part of the DEA course at the HAN University of Applied Sciences. Subject to the
-exercise is a partial implementation of the the HTTP-protocol in a simple Java-based server.
+Deze oefening is deel van de DEA Course aan de Hogeschool Arnhem/Nijmegen. Onderwerp is het bekend 
+raken met het Http-protocol in een simpele Java-server.
 
-Web servers used on the internet are basically server software complying with the HTTP protocol. 
-The HTTP protocol, like all other internet protocols, are specified in so called *Requests for Comments*
-(RFC). The RFC for HTTP can be found here: https://tools.ietf.org/html/rfc7230 .
+Web servers, gebruikt op het internet zijn feitelijk server-software die voldoen aan het Http-protocol.
+Het Http-protocol, zoals ook alle andere internet protocols, is gespecificeerd in een *Request for Comments* 
+(RFC). De RFC voor Http can hier gevonden worden: [https://tools.ietf.org/html/rfc7230]().
 
-HTTP 1.1 is an ASCI-based protocol, which means that server and client communicate with each other
-using readable characters. For seperating message elements, HTTP relies heavily on blank spaces and
-blank lines, as you can see in the RFC. 
 
-# Exercises
-Analyze the start code in the master branch. After starting the server using the main method of the 
-HttpServer-class, you can navigate your browser to [http://localhost:8383/index.html]() to see the served
-content.
+# Oefeningen
+Bekijk de startcode in de master-branch. De server is op te starten via de main-methode van de `HttpServer`
+klasse. 
+Voer deze methode uit. De Server is nu opgestart. Navigeer via je browser naar [http://localhost:8383/index.html]()
+om te zien wat de server teruggeeft.
 
-## Exercise 1)
-Look into the HttpServer class in the startcode and try to understand at which point the program waits
-for client connections. To support your analysis, use google with the keywords *java server socket*.
+## 1) Afhandelen meerdere requests
+Bekijk de startcode in de klasse `HttpServer` en probeer te begrijpen op welk moment de server wacht op Connecties van
+een client. Gebruik Google met de zoektermen *java server socket* om je analyse te ondersteunen.
 
-You will see that your server is currently only serving a single HTTP-request before terminating. Use 
-your knowledge about multithreading in Java to change the HttpServer class in a way that every HTTP request
-is handled in its own thread. Also change the server in a way that it keeps serving forever, thus in
-an endless loop.
+Wat opvalt is dat je Server momenteel maar één Http-request kan afhandelen. Pas dit aan zodat het mogelijk wordt 
+om meerdere Http-requests af te handelen.
 
-## Exercise 2)
-Look into the ConnectionHandler class now. You will see that the server is currently neglecting the entire
-HTTP-request and always serves the same content with the same status. You can verify this by simply changing
-the URL in your browser. Whatever appears after the slash will be answered by the same HTML-code, for instance
-[http://localhost:8383/what-a-terribly-bigoted-server.html](). You will fix this in the following steps.
+* Gebruik je kennis van multithreading om de `HttpServer` klasse zo aan te passen dat ieder Http-request op 
+een eigen `Thread` wordt afgehandeld. 
+* Pas de server zodanig aan dat de `Threads` in een oneindige lus worden opgestart. Op deze manier wordt de server 
+niet meer afgesloten na een Http-request.
 
-### Excercise 2.1)
-Revise the ConnectionHandler in a way that it reads the HTML body from a file called index.html rather than
-from the constant HTTP_BODY. Make sure not to change the content of the file. You can google for the keywords
-*java8 read text file* to get some support. Once you are done, access the page again using your browser to
-verify that the functionality is still in place. 
 
-### Exercise 2.2)
-Now add some more content to the index.html file, restart your server and observe what happens. The content will
-not be fully rendered. This is because the content-length in the HTTP-HEADER is not correct anymore. Revise the
-ConnectionHandler class and make sure that the content-length is calculated automatically, depending on the content
-of the served file. Look into the RFC to get hints on how the content-length is calculated. 
+## 2) Correct afhandelen van het Http-request
+Bekijk de klasse `ConnectionHandler`. Hierin kun je zien dat de server momenteel niks doet met de inhoud van het 
+Http-request en altijd dezelfde inhoud en status retourneert. Je kunt dit testen door het wijzigen van een deel van 
+URL in je browser. ook de URL [http://localhost:8383/what-a-terribly-bigoted-server.html]() zal precies dezelfde content
+retourneren. In dit onderdeel zul je dit gaan verbeteren.
 
-Once you are done, make sure to also determine the value for the Date field of the HTTP-HEADER automatically. Again,
-look into the RFC to understand the expected format and then google for the format in combination with Java.
+### 2.1) Toevoegen van een _index.html_
+De inhoud van de response staat nu nog hard-coded in de `ConnectionHandler`. We gaan deze inhoud verplaatsen naar een 
+_index.html_, die we hierna zullen inlezen en retourneren via het response.
 
-### Exercise 2.3)
-Now let's add some sensibility to the actually requested resources. Remember that our server now always serves
-the same file regardless of the actual request. In HTTP, the first line of a request is called start-line. It 
-contains the HTTP-method, the request target (which is the requested resource), and the HTTP protocol version. 
-Read up on the start-line in the RFC. 
+* Creëer de map _src/main/resources_. Dit is de default plaats binnen een Maven project om extra bestanden te plaatsen.
+Hierbij kun je denken aan plaatjes, configuratiebestanden of html-bestanden.
+* Voeg in deze nieuwe map een submap _pages/_ toe en plaats hierin een _index.html_ met de volgende content
 
-Revise the ConnectionHandler in a way that it returns the correct status code if the HTTP method used in the
-request is not *GET*. Read up on status codes and HTTP methods in the RFC. 
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Simple Http Server</title>
+    </head>
+    <body>
+        <h1>Hi DEA folks!</h1>
+        <p>This is a simple line in html.</p>
+    </body>
+</html>
 
-Now revise the ConnectionHandler in a way that it returns the correct status code if the requested resource is
-not /index.html.   
+```
 
-Finally, make sure to return the correct status code if the protocol used is not HTTP/1.1
+### 2.2) Retourneer _index.html_
+Pas de `ConnectionHandler` zodanig aan dat voor de body van het HTTP-request de file _index.html_ wordt gebruikt.
+* Gebruik voor het inlezen van een bestand de onderstaande methode. 
+* Plaats deze in een aparte klasse genaamd `HtmlPageReader.
+* Merk op dat onderstaande methode verwacht dat het html-bestand in de map _pages/_ staat.
 
-# Challenge
-Add support for the HTTP method *HEAD*. Read up on all available methods in the RFC. You can test your implementation
-using the tool Postman, for instance. 
+```java
+public class HtmlPageReader {
+    public String readFile(String filename) {
+        var fullFileName = "pages/".concat(filename);
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
 
-Finally, add some dynamics regarding the requested resource, i.e. parse the name
-of the requested resource from the start-line, check if a corresponding file is available and return it. Otherwise,
-return the respective HTTP status code.      
+            var file = new File(classLoader.getResource(fullFileName).getFile()).toPath();
+
+            var fileAsString = new String(Files.readAllBytes(file));
+
+            return fileAsString;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+### 2.3) Aanpassen _index.html_ en de Http-header
+Voeg nu wat extra inhoud toe aan je _index.html_, herstart je server en bekijk het resultaat. De inhoud zal nu 
+niet meer volledig gerenderd worden. Dit komt omdat de _content-length_ in de Http-header niet meer correct is.
+* Voeg aan de klasse `HtmlPageReader` een methode toe die op de correcte _content-length_ kan bepalen van een 
+gegeven bestand. Bekijk de RFC om te begrijpen hoe de _content-length_ moeten worden berekend.
+* Gebruik de nieuwe methode om programmatisch een correcte Http-header te genereren.
+
+### 2.4) Toevoegen correcte datum in de Http-header
+Voeg ook een automatisch bepaalde datum aan het _Date_ veld van de Http-header toe. Gebruik hierbij weer de RFC
+om te bepalen welk formaat deze moet hebben.
+
+### 2.5) Retourneer van het correcte bestand
+We gaan nu de afhandeling van de aangevraagde resource (bestand) verwerken. Merk op dat de Server nu altijd 
+dezelfde _index.html_ teruggeeft, los van de url van het daarwerkelijke request. Voeg de functionaliteit toe die 
+ervoor zorgt 
+
+* De eerste regel van een Http-request, de start-line, bevat de Http-methode (in dit geval: GET), de _request-target_ 
+(in dit geval het html-bestand) en de versie van het Http Protocol. Bekijk de RFC voor meer informatie over de 
+start-line.
+* Zorg ervoor dat de `ConnectionHandler` van het Http-request, de start-line gebruikt om te achterhalen welke _html_ 
+pagina geretourneert moet worden.
+* Voeg een tweede pagina, bijvoorbeeld _about.html_ toe en test of deze geretourneert wordt door naar 
+[http://localhost:8383/about.html]() te navigeren.
+
+### 2.6) Retourneren van correct Http-status codes.
+Momenteel wordt nog standaard de Http-code 200 geretourneerd. Zorg ervoor dat de `ConnectionHandler` de een 
+correcte statuscode retourneert indien de _request-target_ niet bestaat.
+
+### 2.7) Correcte versie van het Http-protocol
+Zoek uit welke versie van het Http-protocol wordt gebruikt en zorg ervoor dat dit ook correct staat in de 
+Http-response-header.
+
+# Extra uitdaging
+Het Http-protocol kent meer methodes dan enkel de *GET*. Lees de RFC voor meer informatie en implementeer ook de
+methode *HEAD*.
+
 
 
 
