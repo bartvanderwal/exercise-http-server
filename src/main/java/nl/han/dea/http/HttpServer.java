@@ -21,7 +21,9 @@ public class HttpServer {
         ) {
             System.out.println("Server accepting requests on port " + tcpPort);
             while (true) {
-                new Thread(new ConnectionHandler(serverSocket.accept())).start();
+                var acceptedSocket = serverSocket.accept();
+                var connectionHandler = new ConnectionHandler(acceptedSocket);
+                new Thread(connectionHandler).start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
