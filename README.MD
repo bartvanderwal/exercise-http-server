@@ -93,8 +93,8 @@ om te bepalen welk formaat deze moet hebben.
 
 ### 2.5) Retourneer van het correcte bestand
 We gaan nu de afhandeling van de aangevraagde resource (bestand) verwerken. Merk op dat de Server nu altijd 
-dezelfde _index.html_ teruggeeft, los van de url van het daarwerkelijke request. Voeg de functionaliteit toe die 
-ervoor zorgt 
+dezelfde _index.html_ teruggeeft, los van de url van het daadwerkelijke request. Voeg de functionaliteit toe die 
+ervoor zorgt dat
 
 * De eerste regel van een Http-request, de start-line, bevat de Http-methode (in dit geval: GET), de _request-target_ 
 (in dit geval het html-bestand) en de versie van het Http Protocol. Bekijk de [RFC](https://tools.ietf.org/html/rfc7230) voor meer informatie over de 
