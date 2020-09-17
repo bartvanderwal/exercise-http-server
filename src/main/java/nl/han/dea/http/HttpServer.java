@@ -2,6 +2,7 @@ package nl.han.dea.http;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class HttpServer {
 
@@ -22,7 +23,9 @@ public class HttpServer {
             System.out.println("Server accepting requests on port " + tcpPort);
             while (true) {
                 try {
-                    new Thread(new ConnectionHandler(serverSocket.accept())).start();
+                    var acceptedSocket = serverSocket.accept();
+                    var connectionHandler = new ConnectionHandler(acceptedSocket);
+                    new Thread(connectionHandler).start();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class FileReader {
+public class HtmlPageReader {
 
     public String readFile(String filename) {
         var fullFileName = "pages/".concat(filename);
