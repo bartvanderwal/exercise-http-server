@@ -1,5 +1,7 @@
 # Introductie
 
+Deze uitwerking is een clone van de [originele repo](https://github.com/HANICA-DEA/exercise-http-server), met in de `master` branch een iets alternatieve uitwerking ter ilustratie voor geinteresseerden.
+
 Deze oefening is deel van de DEA Course aan de Hogeschool Arnhem/Nijmegen. Onderwerp is het bekend
 raken met het Http-protocol in een simpele Java-server.
 
