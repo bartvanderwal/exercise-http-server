@@ -1,4 +1,5 @@
-Ve
+# Introductie
+
 Deze oefening is deel van de DEA Course aan de Hogeschool Arnhem/Nijmegen. Onderwerp is het bekend
 raken met het Http-protocol in een simpele Java-server.
 
@@ -11,6 +12,7 @@ Hieronder volgen een aantal oefeningen, waarbij je in verschillende klassen wijz
 na elke oefening de nodigde _refactors_ doet om de code overzichtelijk te houden.
 
 # Oefeningen
+
 Bekijk de startcode in de master-branch. De server is op te starten via de main-methode van de `HttpServer`
 klasse. Zorg ervoor dat je de startcode op een plaats (directory) zet waar geen spaties in voorkomen.
 
@@ -20,6 +22,7 @@ probeer dan Edge of Firefox te gebruiken. Daarnaast kan het zijn dat je browser 
 waardoor de pagina niet laadt. In dat geval kan je met Ctrl + F5 de pagina verversen zonder cache.
 
 ## 1) Afhandelen meerdere requests
+
 Bekijk de startcode in de klasse `HttpServer` en probeer te begrijpen op welk moment de server wacht op Connecties van
 een client. Gebruik Google met de zoektermen "java server socket" om je analyse te ondersteunen.
 
@@ -35,12 +38,14 @@ om meerdere Http-requests af te handelen.
   niet meer afgesloten na afhandelen van een Http-request.
 
 ## 2) Correct afhandelen van het Http-request
+
 Bekijk de klasse `ConnectionHandler`. Hierin kun je zien dat de server momenteel niks doet met de inhoud van het
 Http-request en altijd dezelfde inhoud en status retourneert. Je kunt dit testen door een deel van de URL te wijzigen. 
 Ook de URL [http://localhost:8383/what-a-terribly-bigoted-server.html](http://localhost:8383/what-a-terribly-bigoted-server.html) 
 zal precies dezelfde content retourneren. In dit onderdeel zul je dit gaan verbeteren.
 
 ### 2.1) Toevoegen van een _index.html_
+
 Een Http-response bevat altijd een _status-line_, een of meer Http-headers en optioneel een Http-body (de inhoud van het 
 bericht). De body van de response staat nu nog hard-coded in de `ConnectionHandler`. We gaan deze body verplaatsen naar
 een _index.html_ bestand, die we daarna zullen inlezen en retourneren via de response.
@@ -65,6 +70,7 @@ een _index.html_ bestand, die we daarna zullen inlezen en retourneren via de res
 ```
 
 ### 2.2) Retourneer _index.html_
+
 Pas de `ConnectionHandler` zodanig aan dat voor de Http-body van het Http-request de file _index.html_ wordt gebruikt.
 * Gebruik voor het inlezen van een bestand de onderstaande methode.
 * Plaats deze in een aparte klasse genaamd `HtmlPageReader`.
@@ -92,6 +98,7 @@ public class HtmlPageReader {
 ```
 
 ### 2.3) Aanpassen _index.html_ en de Http-headers
+
 Voeg nu wat extra inhoud toe aan je _index.html_, herstart je server en bekijk het resultaat. De inhoud zal nu
 niet meer volledig gerenderd worden. Dit komt omdat de _Content-Length_ headerwaarde niet meer correct is.
 De specificaties voor Http response headers vind je in de opeenvolgende [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231).
@@ -100,10 +107,12 @@ De specificaties voor Http response headers vind je in de opeenvolgende [RFC7231
 * Gebruik de nieuwe methode om programmatisch de correcte Http-headers te genereren.
 
 ### 2.4) Toevoegen correcte datum in de Http-header
+
 De *Date* headerwaarde is op dit moment statisch. Vervang deze door de datum waarop een response verstuurd
 wordt. Gebruik hierbij weer RFC7231 om te bepalen welk formaat deze headerwaarde moet hebben.
 
 ### 2.5) Retourneren van het correcte bestand
+
 We gaan nu de afhandeling van de aangevraagde resource (bestand) verwerken. Merk op dat de Server nu altijd
 dezelfde _index.html_ teruggeeft, los van de url van het daadwerkelijke request. Voeg de volgende functionaliteit toe:
 * De eerste regel van een Http-request, de start-line, bevat de Http-methode (in dit geval: GET), de _request-target_
@@ -116,6 +125,7 @@ dezelfde _index.html_ teruggeeft, los van de url van het daadwerkelijke request.
 * Merk op dat het nu enkel mogelijk moet zijn bestaande pagina's op te vragen, de happy-flow.
 
 ### 2.6) Retourneren van de correcte Http-status
+
 Momenteel wordt nog standaard de Http-statuscode _200_ geretourneerd. Zorg ervoor dat de `ConnectionHandler` de
 correcte statuscode retourneert indien de _request-target_ niet bestaat. Zie voor de beschrijvingen van Http-statuscodes 
 [RFC7231](https://datatracker.ietf.org/doc/html/rfc7231).
@@ -124,6 +134,7 @@ correcte statuscode retourneert indien de _request-target_ niet bestaat. Zie voo
 * Gebruik deze exceptie in de `ConnectionHandler` om zowel de juiste Http-header, als Http-body te retourneren.
 
 # Extra uitdaging
+
 * Verbeter de foutafhandeling. Momenteel wordt enkel onderscheid gemaakt tussen 404 en 200. Voeg ook, op een correcte
   en zinnige manier ondersteuning voor de volgende Http-statuscodes toe:
   * 500 INTERNAL SERVER ERROR
