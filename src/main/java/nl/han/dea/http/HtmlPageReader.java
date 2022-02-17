@@ -11,12 +11,11 @@ public class HtmlPageReader {
 
     public FileInfo readFile(String filename) throws IOException {
         var fullFileName = "pages/".concat(filename);
-        var classLoader = getClass().getClassLoader();
         try {
-            var filePath = new File(classLoader.getResource(fullFileName).getFile()).toString();
+            var filePath = new File(getClass().getClassLoader().getResource(fullFileName).getFile()).toString();
+
             // Bron: https://stackoverflow.com/questions/31133361/how-to-get-file-from-resources-when-blank-space-is-in-path#answer-31133466
-            var decodedPath = URLDecoder.decode(filePath); // Equivalent met `var decodedPath = filePath.replace("%20", " ");` maar dan nog wat algemener.
-            Path path = Paths.get(decodedPath);
+            Path path = Paths.get(URLDecoder.decode(filePath));
 
             var fileAsString = new String(Files.readAllBytes(path));
             var fileInfo = new FileInfo(fileAsString);
